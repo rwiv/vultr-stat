@@ -1,4 +1,4 @@
-package error
+package client
 
 import (
 	"fmt"
@@ -23,10 +23,6 @@ func CheckErrorResponse(res *http.Response) error {
 			return err
 		}
 		return body
-	}
-	if res.StatusCode >= 300 {
-		err := NewRedirectError(res)
-		return err
 	}
 	return nil
 }

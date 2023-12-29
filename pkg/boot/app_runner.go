@@ -3,8 +3,10 @@ package boot
 import (
 	"fmt"
 	"os"
-	"vultr-stat/pkg/client/client"
-	"vultr-stat/pkg/lib/string/format"
+
+	"vultr-stat/pkg/client"
+	"vultr-stat/pkg/tfac"
+	"vultr-stat/pkg/tfac/tw"
 )
 
 type AppRunner struct {
@@ -28,9 +30,8 @@ func (r *AppRunner) Run() {
 			fmt.Println(err)
 			return
 		}
-		for _, osInfo := range res.Os {
-			json := format.ToJsonPretty(osInfo)
-			fmt.Println(json)
-		}
+		f := tfac.NewOsTableFactory()
+		t := tw.GetTable(f.Columns(), f.Rows(res.Os))
+		t.Render()
 	}
 }

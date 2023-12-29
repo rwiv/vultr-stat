@@ -1,4 +1,4 @@
-package types
+package client
 
 type Meta struct {
 	Total int32 `json:"total"`
@@ -11,8 +11,8 @@ type Links struct {
 }
 
 type OsResponse struct {
-	Os   []OS `json:"os"`
-	Meta Meta `json:"meta"`
+	Os   []*OS `json:"os"`
+	Meta *Meta `json:"meta"`
 }
 
 type OS struct {
