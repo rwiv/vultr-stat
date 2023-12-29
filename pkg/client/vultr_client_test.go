@@ -8,14 +8,14 @@ import (
 	"vultr-stat/pkg/lib/string/format"
 )
 
-func TestOs(t *testing.T) {
+func TestInstances(t *testing.T) {
 	client := NewVultrClient()
-	res, err := client.Os()
+	res, err := client.Instances()
 	if err != nil {
 		t.Fatal(err)
 	}
-	for _, os := range res.Os {
-		json := format.ToJsonPretty(os)
+	for _, instance := range res.Instances {
+		json := format.ToJsonPretty(instance)
 		fmt.Println(json)
 	}
 }

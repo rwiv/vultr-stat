@@ -35,6 +35,14 @@ func (ac *Client) Account() (*AccountResponse, error) {
 	return json.ReadReader(res.Body, new(AccountResponse))
 }
 
+func (ac *Client) Instances() (*InstanceResponse, error) {
+	res, err := RequestHttp(nil, nil, GetHeader(), http.MethodGet, url("/instances"))
+	if err != nil {
+		return nil, err
+	}
+	return json.ReadReader(res.Body, new(InstanceResponse))
+}
+
 //func (ac *Client) Oses() ([]*OsResponse, error) {
 //	res, err := cutil.RequestHttp(nil, nil, http.MethodGet, url("/os"))
 //	if err != nil {

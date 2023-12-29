@@ -1,39 +1,39 @@
 package client
 
-//export interface InstanceResponse {
-//	instances: Instance[];
-//	meta: Meta;
-//}
-//
-//export interface Instance {
-//	id: string;
-//	os: string;
-//	ram: number;
-//	disk: number;
-//	main_ip: string;
-//	vcpu_count: number;
-//	region: string;
-//	plan: string;
-//	date_created: string;
-//	status: string;
-//	allowed_bandwidth: number;
-//	netmask_v4: string;
-//	gateway_v4: string;
-//	power_status: string;
-//	server_status: string;
-//	v6_network: string;
-//	v6_main_ip: string;
-//	v6_network_size: number;
-//	label: string;
-//	internal_ip: string;
-//	kvm: string;
-//	hostname: string;
-//	tag: string;
-//	tags: any[];
-//	os_id: number;
-//	app_id: number;
-//	image_id: string;
-//	firewall_group_id: string;
-//	features: any[];
-//	user_scheme: string;
-//}
+type InstanceResponse struct {
+	Instances []*Instance `json:"instances"`
+	Meta      *Meta       `json:"meta"`
+}
+
+type Instance struct {
+	Id               string   `json:"id"`
+	Os               string   `json:"os"`
+	Ram              int32    `json:"ram"`
+	Disk             int32    `json:"disk"`
+	MainIp           string   `json:"main_ip"`
+	VcpuCount        int32    `json:"vcpu_count"`
+	Region           string   `json:"region"`
+	Plan             string   `json:"plan"`
+	DateCreated      string   `json:"date_created"`
+	Status           string   `json:"status"`
+	AllowedBandwidth int64    `json:"allowed_bandwidth"`
+	NetmaskV4        string   `json:"netmask_v4"`
+	GatewayV4        string   `json:"gateway_v4"`
+	PowerStatus      string   `json:"power_status"`
+	ServerStatus     string   `json:"server_status"`
+	V6Network        string   `json:"v6_network"`
+	V6MainIp         string   `json:"v6_main_ip"`
+	V6NetworkSize    int64    `json:"v6_network_size"`
+	Label            string   `json:"label"`
+	InternalIp       string   `json:"internal_ip"`
+	Kvm              string   `json:"kvm"`
+	Hostname         string   `json:"hostname"`
+	Tag              string   `json:"tag"`
+	Tags             []string `json:"tags"`
+	OsId             int64    `json:"os_id"`
+	AppId            int64    `json:"app_id"`
+	ImageId          string   `json:"image_id"`
+	FirewallGroupId  string   `json:"firewall_group_id"`
+	Features         []any    `json:"features"`
+	UserScheme       string   `json:"user_scheme"`
+}
