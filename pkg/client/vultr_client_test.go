@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"testing"
 
-	"vultr-stat/pkg/lib/date"
 	"vultr-stat/pkg/lib/string/format"
 )
 
@@ -26,14 +25,5 @@ func TestAccount(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	json := format.ToJsonPretty(res.Account)
-	fmt.Println(json)
-
-	tm, err := date.ByRFC3339String(res.Account.LastPaymentDate)
-	if err != nil {
-		t.Fatal(err)
-	}
-	dateStr := date.ToPrettyString(tm)
-	fmt.Println(dateStr)
-	fmt.Println(date.ToRFC3339String(tm))
+	fmt.Println(res.Account.ToInfo().ToPretty())
 }

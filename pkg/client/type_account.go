@@ -1,28 +1,59 @@
 package client
 
+import (
+	"fmt"
+
+	"vultr-stat/pkg/lib/date"
+)
+
 type AccountResponse struct {
 	Account *Account `json:"account"`
 }
 
 type Account struct {
-	Balance           float64  `json:"balance"`
-	PendingCharges    float64  `json:"pending_charges"`
-	Name              string   `json:"name"`
+	Balance           float64  `json:"balance"`         // 여분 잔액
+	PendingCharges    float64  `json:"pending_charges"` // 보류 중인 금액
+	Name              string   `json:"name"`            // 유저 이름(본명)
 	Email             string   `json:"email"`
 	Acls              []string `json:"acls"`
-	LastPaymentDate   string   `json:"last_payment_date"`
+	LastPaymentDate   string   `json:"last_payment_date"` // 최근 결제일, RFC3339 포맷
 	LastPaymentAmount float64  `json:"last_payment_amount"`
 }
 
-//export interface Account {
-//	balance: number; // 여분 잔액
-//	pending_charges: number; // 보류 중인 금액
-//	name: string; // 유저 이름(본명)
-//	email: string;
-//	acls: string[]; // 접근 가능 권한들. billing, firewall...
-//	last_payment_date: string; // 최근 결제일, ISO 포맷
-//	last_payment_amount: number;
-//}
+func (a *Account) ToInfo() *AccountInfo {
+	lpdTime, err := date.ByRFC3339String(a.LastPaymentDate)
+	if err != nil {
+		panic(err)
+	}
+	return &AccountInfo{
+		Name:              a.Name,
+		Email:             a.Email,
+		Balance:           a.Balance,
+		PendingCharges:    a.PendingCharges,
+		LastPaymentDate:   date.ToPrettyString(lpdTime),
+		LastPaymentAmount: a.LastPaymentAmount,
+	}
+}
+
+type AccountInfo struct {
+	Name              string  `json:"name"` // 유저 이름(본명)
+	Email             string  `json:"email"`
+	Balance           float64 `json:"balance"`           // 여분 잔액
+	PendingCharges    float64 `json:"pending_charges"`   // 보류 중인 금액
+	LastPaymentDate   string  `json:"last_payment_date"` // 최근 결제일, RFC3339 포맷
+	LastPaymentAmount float64 `json:"last_payment_amount"`
+}
+
+func (a *AccountInfo) ToPretty() string {
+	result := ""
+	result += fmt.Sprintf("Name:                   %s\n", a.Name)
+	result += fmt.Sprintf("Email:                  %s\n", a.Email)
+	result += fmt.Sprintf("Balance:                %f\n", a.Balance)
+	result += fmt.Sprintf("Pending Charges         %f\n", a.PendingCharges)
+	result += fmt.Sprintf("Last Payment Date:      %s\n", a.LastPaymentDate)
+	result += fmt.Sprintf("Last Payment Ammount:   %f\n", a.LastPaymentAmount)
+	return result
+}
 
 // billing/history
 //export interface BillingHistoryResponse {
@@ -32,7 +63,7 @@ type Account struct {
 //
 //export interface BillingHistory {
 //	id: number
-//	date: string; // 결제일. ISO 포맷
+//	date: string; // 결제일. RFC3339 포맷
 //	type: string; // 결제 타입. invoice, payment...
 //	description: string; // 세부 정보
 //	amount: number; // 금액, 달러 단위. 음수면 충전되었다는 것.

@@ -61,8 +61,7 @@ func (r *AppRunner) Run() {
 			fmt.Println(err)
 			return
 		}
-		json := format.ToJsonPretty(res.Account)
-		fmt.Println(json)
+		fmt.Println(res.Account.ToInfo().ToPretty())
 		return
 	}
 }
