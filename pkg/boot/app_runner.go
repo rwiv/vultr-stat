@@ -34,4 +34,16 @@ func (r *AppRunner) Run() {
 		t := tw.GetTable(f.Columns(), f.Rows(res.Os))
 		t.Render()
 	}
+
+	if os.Args[1] == "ac" {
+		res, err := vultr.Account()
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		fmt.Println(res.Account)
+		//f := tfac.NewOsTableFactory()
+		//t := tw.GetTable(f.Columns(), f.Rows(res.Os))
+		//t.Render()
+	}
 }

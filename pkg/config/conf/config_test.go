@@ -6,9 +6,6 @@ import (
 )
 
 func TestGetConfig(t *testing.T) {
-	conf, err := GetConf()
-	if err != nil {
-		t.Error(err)
-	}
+	conf := GetConf()
 	fmt.Println(conf.VultrApiKey)
 }

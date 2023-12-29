@@ -57,10 +57,7 @@ func urlQs(path string, qs QueryString) string {
 
 func GetHeader() map[string]string {
 	headers := make(map[string]string)
-	cf, err := conf.GetConf()
-	if err != nil {
-		return headers
-	}
+	cf := conf.GetConf()
 	headers["Authorization"] = fmt.Sprintf("Bearer %s", cf.VultrApiKey)
 
 	return headers
