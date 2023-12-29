@@ -1,5 +1,5 @@
 package consts
 
 const (
-	Endpoint = "http://192.168.0.14:8080"
+	Endpoint = "https://api.vultr.com/v2"
 )

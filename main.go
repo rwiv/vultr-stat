@@ -1,9 +1,10 @@
 package main
 
 import (
-	"fmt"
+	"vultr-stat/pkg/boot"
 )
 
 func main() {
-	fmt.Println("hello")
+	appRunner := boot.NewAppRunner()
+	appRunner.Run()
 }

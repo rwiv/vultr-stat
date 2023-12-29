@@ -9,3 +9,11 @@ func ToJson(v any) string {
 	}
 	return string(b)
 }
+
+func ToJsonPretty(v any) string {
+	b, err := json.MarshalIndent(v, "", "  ")
+	if err != nil {
+		return ""
+	}
+	return string(b)
+}
