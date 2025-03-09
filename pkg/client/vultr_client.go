@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"sync"
 
 	"github.com/rwiv/vultr-stat/pkg/common"
 	"github.com/rwiv/vultr-stat/pkg/lib/json"
@@ -11,34 +12,34 @@ import (
 	urlutil "github.com/rwiv/vultr-stat/pkg/lib/web/url"
 )
 
-type Client struct {
+type VultrClient struct {
 	ApiKey string
 }
 
-func NewVultrClient(apiKey string) *Client {
-	return &Client{
+func NewVultrClient(apiKey string) *VultrClient {
+	return &VultrClient{
 		ApiKey: apiKey,
 	}
 }
 
-func (ac *Client) Os() (*OsResponse, error) {
-	res, err := RequestHttp(nil, nil, ac.GetHeader(), http.MethodGet, url("/os"))
+func (vc *VultrClient) Os() (*OsResponse, error) {
+	res, err := RequestHttp(nil, nil, vc.GetHeader(), http.MethodGet, url("/os"))
 	if err != nil {
 		return nil, err
 	}
 	return json.ReadReader(res.Body, new(OsResponse))
 }
 
-func (ac *Client) Account() (*AccountResponse, error) {
-	res, err := RequestHttp(nil, nil, ac.GetHeader(), http.MethodGet, url("/account"))
+func (vc *VultrClient) Account() (*AccountResponse, error) {
+	res, err := RequestHttp(nil, nil, vc.GetHeader(), http.MethodGet, url("/account"))
 	if err != nil {
 		return nil, err
 	}
 	return json.ReadReader(res.Body, new(AccountResponse))
 }
 
-func (ac *Client) Instances(withUsage bool) ([]*InstanceInfo, error) {
-	res, err := RequestHttp(nil, nil, ac.GetHeader(), http.MethodGet, url("/instances"))
+func (vc *VultrClient) Instances(withUsedBandwidth bool) ([]*InstanceInfo, error) {
+	res, err := RequestHttp(nil, nil, vc.GetHeader(), http.MethodGet, url("/instances"))
 	if err != nil {
 		return nil, err
 	}
@@ -46,25 +47,46 @@ func (ac *Client) Instances(withUsage bool) ([]*InstanceInfo, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	instances := make([]*InstanceInfo, 0)
+
+	var wg sync.WaitGroup
+	results := make(chan *InstanceInfo, len(raw.Instances))
 	for _, instance := range raw.Instances {
-		var usedBandwidth *int64
-		if withUsage {
-			bres, err := ac.Bandwidth(instance.Id)
-			if err != nil {
-				return nil, err
-			}
-			tmp := int64(bres.Sum().ToGb().OutgoingBytes)
-			usedBandwidth = &tmp
-		}
-		instances = append(instances, instance.ToInfo(usedBandwidth))
+		wg.Add(1)
+		go vc.solveInstanceInfo(instance, withUsedBandwidth, &wg, results)
 	}
+	wg.Wait()
+	close(results)
+	for result := range results {
+		instances = append(instances, result)
+	}
+
 	return instances, nil
 }
 
-func (ac *Client) Bandwidth(instanceId string) (*InstanceBandwidthResponse, error) {
+func (vc *VultrClient) solveInstanceInfo(
+	instance *Instance,
+	withUsedBandwidth bool,
+	wg *sync.WaitGroup,
+	results chan<- *InstanceInfo,
+) {
+	defer wg.Done()
+	var usedBandwidth *int64
+	if withUsedBandwidth {
+		bres, err := vc.Bandwidth(instance.Id)
+		if err != nil {
+			fmt.Println(err)
+		}
+		tmp := int64(bres.Sum().ToGb().OutgoingBytes)
+		usedBandwidth = &tmp
+	}
+	results <- instance.ToInfo(usedBandwidth)
+}
+
+func (vc *VultrClient) Bandwidth(instanceId string) (*InstanceBandwidthResponse, error) {
 	paths := fmt.Sprintf("/instances/%s/bandwidth", instanceId)
-	res, err := RequestHttp(nil, nil, ac.GetHeader(), http.MethodGet, url(paths))
+	res, err := RequestHttp(nil, nil, vc.GetHeader(), http.MethodGet, url(paths))
 	if err != nil {
 		return nil, err
 	}
@@ -83,14 +105,20 @@ func urlQs(path string, qs QueryString) string {
 	return urlutil.GetUrlQs(common.Endpoint, path, qs.ToQueryString())
 }
 
-func (ac *Client) GetHeader() map[string]string {
+func (vc *VultrClient) GetHeader() map[string]string {
 	headers := make(map[string]string)
-	headers["Authorization"] = fmt.Sprintf("Bearer %s", ac.ApiKey)
+	headers["Authorization"] = fmt.Sprintf("Bearer %s", vc.ApiKey)
 
 	return headers
 }
 
-func RequestHttp(body io.Reader, err error, headers map[string]string, method string, url string) (*http.Response, error) {
+func RequestHttp(
+	body io.Reader,
+	err error,
+	headers map[string]string,
+	method string,
+	url string,
+) (*http.Response, error) {
 	res, err := request.Request(method, url, headers, body, err)
 	if err != nil {
 		return nil, err
