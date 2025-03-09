@@ -14,11 +14,11 @@ func TestInstances(t *testing.T) {
 		t.Fatal(err)
 	}
 	client := NewVultrClient(env.VultrApiKey)
-	res, err := client.Instances()
+	instances, err := client.Instances(true)
 	if err != nil {
 		t.Fatal(err)
 	}
-	for _, instance := range res.Instances {
+	for _, instance := range instances {
 		json := format.ToJsonPretty(instance)
 		fmt.Println(json)
 	}

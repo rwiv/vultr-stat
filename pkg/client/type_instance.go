@@ -37,3 +37,52 @@ type Instance struct {
 	Features         []any    `json:"features"`
 	UserScheme       string   `json:"user_scheme"`
 }
+
+func (ins *Instance) ToInfo(usedBandwidth *int64) *InstanceInfo {
+	return &InstanceInfo{
+		Id:               ins.Id,
+		Os:               ins.Os,
+		Ram:              ins.Ram,
+		Disk:             ins.Disk,
+		MainIp:           ins.MainIp,
+		VcpuCount:        ins.VcpuCount,
+		Region:           ins.Region,
+		Plan:             ins.Plan,
+		DateCreated:      ins.DateCreated,
+		Status:           ins.Status,
+		AllowedBandwidth: ins.AllowedBandwidth,
+		NetmaskV4:        ins.NetmaskV4,
+		GatewayV4:        ins.GatewayV4,
+		PowerStatus:      ins.PowerStatus,
+		ServerStatus:     ins.ServerStatus,
+		OsId:             ins.OsId,
+		AppId:            ins.AppId,
+		ImageId:          ins.ImageId,
+		FirewallGroupId:  ins.FirewallGroupId,
+		UsedBandwidth:    usedBandwidth,
+	}
+}
+
+type InstanceInfo struct {
+	Id               string `json:"id"`
+	Os               string `json:"os"`
+	Ram              int32  `json:"ram"`
+	Disk             int32  `json:"disk"`
+	MainIp           string `json:"main_ip"`
+	VcpuCount        int32  `json:"vcpu_count"`
+	Region           string `json:"region"`
+	Plan             string `json:"plan"`
+	DateCreated      string `json:"date_created"`
+	Status           string `json:"status"`
+	AllowedBandwidth int64  `json:"allowed_bandwidth"`
+	NetmaskV4        string `json:"netmask_v4"`
+	GatewayV4        string `json:"gateway_v4"`
+	PowerStatus      string `json:"power_status"`
+	ServerStatus     string `json:"server_status"`
+	OsId             int64  `json:"os_id"`
+	AppId            int64  `json:"app_id"`
+	ImageId          string `json:"image_id"`
+	FirewallGroupId  string `json:"firewall_group_id"`
+
+	UsedBandwidth *int64 `json:"used_bandwidth"`
+}
