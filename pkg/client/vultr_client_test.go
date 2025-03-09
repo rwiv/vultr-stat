@@ -14,7 +14,7 @@ func TestInstances(t *testing.T) {
 		t.Fatal(err)
 	}
 	client := NewVultrClient(env.VultrApiKey)
-	instances, err := client.Instances(true)
+	instances, err := client.Instances(true, true)
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -30,16 +30,12 @@ func (f *InstanceTableFactory) SimpleColumns() []string {
 func (f *InstanceTableFactory) SimpleRows(instances []*client.InstanceInfo) [][]string {
 	var rows [][]string
 	for _, instance := range instances {
-		createdAt, err := date.ByRFC3339String(instance.DateCreated)
-		if err != nil {
-			panic(err)
-		}
 		row := []string{
 			strings.Split(instance.Id, "-")[0] + "...",
 			instance.MainIp,
 			fmt.Sprintf("%vGB", instance.AllowedBandwidth),
 			fmt.Sprintf("%vGB", *instance.UsedBandwidth),
-			date.ToPrettyString(createdAt),
+			date.ToPrettyString(instance.DateCreated),
 			instance.PowerStatus,
 			instance.Status,
 		}
@@ -70,16 +66,12 @@ func (f *InstanceTableFactory) DetailColumns() []string {
 func (f *InstanceTableFactory) DetailRows(instances []*client.InstanceInfo) [][]string {
 	var rows [][]string
 	for _, instance := range instances {
-		createdAt, err := date.ByRFC3339String(instance.DateCreated)
-		if err != nil {
-			panic(err)
-		}
 		row := []string{
 			instance.Id,
 			instance.MainIp,
 			fmt.Sprintf("%vGB", instance.AllowedBandwidth),
 			fmt.Sprintf("%vGB", *instance.UsedBandwidth),
-			date.ToPrettyString(createdAt),
+			date.ToPrettyString(instance.DateCreated),
 			instance.PowerStatus,
 			instance.Status,
 

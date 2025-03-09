@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"sort"
 	"sync"
 
 	"github.com/rwiv/vultr-stat/pkg/common"
@@ -38,7 +39,7 @@ func (vc *VultrClient) Account() (*AccountResponse, error) {
 	return json.ReadReader(res.Body, new(AccountResponse))
 }
 
-func (vc *VultrClient) Instances(withUsedBandwidth bool) ([]*InstanceInfo, error) {
+func (vc *VultrClient) Instances(withUsedBandwidth bool, isAsc bool) ([]*InstanceInfo, error) {
 	res, err := RequestHttp(nil, nil, vc.GetHeader(), http.MethodGet, url("/instances"))
 	if err != nil {
 		return nil, err
@@ -62,6 +63,14 @@ func (vc *VultrClient) Instances(withUsedBandwidth bool) ([]*InstanceInfo, error
 		instances = append(instances, result)
 	}
 
+	sort.Slice(instances, func(i, j int) bool {
+		if isAsc {
+			return instances[i].DateCreated.Before(instances[j].DateCreated)
+		} else {
+			return instances[i].DateCreated.After(instances[j].DateCreated)
+		}
+	})
+
 	return instances, nil
 }
 
@@ -81,7 +90,12 @@ func (vc *VultrClient) solveInstanceInfo(
 		tmp := int64(bres.Sum().ToGb().OutgoingBytes)
 		usedBandwidth = &tmp
 	}
-	results <- instance.ToInfo(usedBandwidth)
+	result, err := instance.ToInfo(usedBandwidth)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	results <- result
 }
 
 func (vc *VultrClient) Bandwidth(instanceId string) (*InstanceBandwidthResponse, error) {

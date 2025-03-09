@@ -25,7 +25,7 @@ func (r *AppRunner) Run() {
 	vultr := client.NewVultrClient(env.VultrApiKey)
 
 	if len(os.Args) < 2 || os.Args[1] == "" {
-		instances, err := vultr.Instances(true)
+		instances, err := vultr.Instances(true, true)
 		if err != nil {
 			fmt.Println(err)
 			return
@@ -38,7 +38,7 @@ func (r *AppRunner) Run() {
 	}
 
 	if len(os.Args) < 2 || os.Args[1] == "-v" {
-		instances, err := vultr.Instances(true)
+		instances, err := vultr.Instances(true, true)
 		if err != nil {
 			fmt.Println(err)
 			return
