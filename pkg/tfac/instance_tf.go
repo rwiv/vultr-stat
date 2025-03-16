@@ -17,10 +17,10 @@ func NewInstanceTableFactory() InstanceTableFactory {
 
 func (f *InstanceTableFactory) SimpleColumns() []string {
 	return []string{
-		"ID",
+		"IDX",
+		"AVAILABLE",
 		"IP",
-		"ALLOWED",
-		"USAGE",
+		"ID",
 		"CREATED",
 		"POWER",
 		"STATUS",
@@ -29,12 +29,12 @@ func (f *InstanceTableFactory) SimpleColumns() []string {
 
 func (f *InstanceTableFactory) SimpleRows(instances []*client.InstanceInfo) [][]string {
 	var rows [][]string
-	for _, instance := range instances {
+	for i, instance := range instances {
 		row := []string{
-			strings.Split(instance.Id, "-")[0] + "...",
+			fmt.Sprintf("%v", i+1),
+			fmt.Sprintf("%vGB", instance.AllowedBandwidth-*instance.UsedBandwidth),
 			instance.MainIp,
-			fmt.Sprintf("%vGB", instance.AllowedBandwidth),
-			fmt.Sprintf("%vGB", *instance.UsedBandwidth),
+			strings.Split(instance.Id, "-")[0] + "...",
 			date.ToPrettyString(instance.DateCreated),
 			instance.PowerStatus,
 			instance.Status,
@@ -46,10 +46,12 @@ func (f *InstanceTableFactory) SimpleRows(instances []*client.InstanceInfo) [][]
 
 func (f *InstanceTableFactory) DetailColumns() []string {
 	return []string{
-		"ID",
-		"IP",
+		"IDX",
+		"AVAILABLE",
 		"ALLOWED",
 		"USAGE",
+		"IP",
+		"ID",
 		"CREATED",
 		"POWER",
 		"STATUS",
@@ -65,12 +67,14 @@ func (f *InstanceTableFactory) DetailColumns() []string {
 
 func (f *InstanceTableFactory) DetailRows(instances []*client.InstanceInfo) [][]string {
 	var rows [][]string
-	for _, instance := range instances {
+	for i, instance := range instances {
 		row := []string{
-			instance.Id,
-			instance.MainIp,
+			fmt.Sprintf("%v", i+1),
+			fmt.Sprintf("%vGB", instance.AllowedBandwidth-*instance.UsedBandwidth),
 			fmt.Sprintf("%vGB", instance.AllowedBandwidth),
 			fmt.Sprintf("%vGB", *instance.UsedBandwidth),
+			instance.MainIp,
+			instance.Id,
 			date.ToPrettyString(instance.DateCreated),
 			instance.PowerStatus,
 			instance.Status,
